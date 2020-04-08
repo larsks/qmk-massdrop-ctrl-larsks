@@ -12,33 +12,24 @@ RGB_MATRIX_EFFECT(LARSKS_ALPHAS_MODS)
 
 // alphas = color1, mods = color2
 bool LARSKS_ALPHAS_MODS(effect_params_t* params) {
+    HSV hsv_esc     = { 0,   255, rgb_matrix_config.hsv.v}; // #FF0000
+    HSV hsv_mod     = { 128, 255, rgb_matrix_config.hsv.v}; // #00FCFF
+    HSV hsv_alpha   = { 0,   0,   rgb_matrix_config.hsv.v}; // #FFFFFF
+
+    RGB rgb;
+
     RGB_MATRIX_USE_LIMITS(led_min, led_max);
-
-    RGB rgb_esc;
-    RGB rgb_alpha;
-    RGB rgb_mod;
-
-    rgb_esc.r = 255;
-    rgb_esc.g = 0;
-    rgb_esc.b = 0;
-
-    rgb_alpha.r = 255;
-    rgb_alpha.g = 255;
-    rgb_alpha.b = 255;
-
-    rgb_mod.r = 0;
-    rgb_mod.g = 252;
-    rgb_mod.b = 255;
 
     for (uint8_t i = led_min; i < led_max; i++) {
         RGB_MATRIX_TEST_LED_FLAGS();
         if (i == 0) {
-            rgb_matrix_set_color(i, rgb_esc.r, rgb_esc.g, rgb_esc.b);
+            rgb = hsv_to_rgb(hsv_esc);
         } else if (HAS_FLAGS(g_led_config.flags[i], LED_FLAG_MODIFIER)) {
-            rgb_matrix_set_color(i, rgb_mod.r, rgb_mod.g, rgb_mod.b);
+            rgb = hsv_to_rgb(hsv_mod);
         } else {
-            rgb_matrix_set_color(i, rgb_alpha.r, rgb_alpha.g, rgb_alpha.b);
+            rgb = hsv_to_rgb(hsv_alpha);
         }
+        rgb_matrix_set_color(i, rgb.r, rgb.g, rgb.b);
     }
     return led_max < DRIVER_LED_TOTAL;
 }
