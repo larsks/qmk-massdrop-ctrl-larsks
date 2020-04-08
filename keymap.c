@@ -1,14 +1,15 @@
 #include QMK_KEYBOARD_H
 
 enum ctrl_keycodes {
-    U_T_AUTO = SAFE_RANGE, //USB Extra Port Toggle Auto Detect / Always Active
-    U_T_AGCR,              //USB Toggle Automatic GCR control
-    DBG_TOG,               //DEBUG Toggle On / Off
-    DBG_MTRX,              //DEBUG Toggle Matrix Prints
-    DBG_KBD,               //DEBUG Toggle Keyboard Prints
-    DBG_MOU,               //DEBUG Toggle Mouse Prints
-    MD_BOOT,               //Restart into bootloader after hold timeout
-    RGB_RST,               //Reset LEDs to initial state
+    U_T_AUTO = SAFE_RANGE, // USB Extra Port Toggle Auto Detect / Always Active
+    U_T_AGCR,              // USB Toggle Automatic GCR control
+    DBG_TOG,               // DEBUG Toggle On / Off
+    DBG_MTRX,              // DEBUG Toggle Matrix Prints
+    DBG_KBD,               // DEBUG Toggle Keyboard Prints
+    DBG_MOU,               // DEBUG Toggle Mouse Prints
+    MD_BOOT,               // Restart into bootloader after hold timeout
+    RGB_RST,               // Reset LEDs to initial state
+    RGB_DBG,               // DEBUG show rgb settings
 };
 
 enum kbd_layers {
@@ -34,7 +35,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,   KC_MPLY, KC_MSTP, KC_VOLU, \
         _______, RGB_SPD, RGB_VAI, RGB_SPI, RGB_HUI, RGB_SAI, _______, U_T_AUTO,U_T_AGCR,_______, _______, _______, _______, _______,   KC_MPRV, KC_MNXT, KC_VOLD, \
         _______, RGB_RMOD,RGB_VAD, RGB_MOD, RGB_HUD, RGB_SAD, _______, _______, _______, _______, _______, _______, _______, \
-        _______, RGB_TOG, RGB_RST, _______, _______, MD_BOOT, NK_TOGG, TG(_MOUSE), _______, _______, _______, _______,                              _______, \
+        _______, RGB_TOG, RGB_RST, RGB_DBG, _______, MD_BOOT, NK_TOGG, TG(_MOUSE), _______, _______, _______, _______,                              _______, \
         _______, _______, _______,                   _______,                            _______, _______, _______, _______,            _______, _______, _______ \
     ),
     [_MOUSE] = LAYOUT(
@@ -76,6 +77,9 @@ void matrix_scan_user(void) {
 #define MODS_SHIFT  (get_mods() & MOD_BIT(KC_LSHIFT) || get_mods() & MOD_BIT(KC_RSHIFT))
 #define MODS_CTRL  (get_mods() & MOD_BIT(KC_LCTL) || get_mods() & MOD_BIT(KC_RCTRL))
 #define MODS_ALT  (get_mods() & MOD_BIT(KC_LALT) || get_mods() & MOD_BIT(KC_RALT))
+
+// Actually defined in quantum/rgb_matrix.c
+void eeconfig_debug_rgb_matrix(void);
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     static uint32_t key_timer;
@@ -123,6 +127,11 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         case RGB_RST:
             if (record->event.pressed) {
                 rgb_matrix_mode(RGB_MATRIX_STARTUP_MODE);
+            }
+            return false;
+        case RGB_DBG:
+            if (record->event.pressed) {
+                eeconfig_debug_rgb_matrix();
             }
             return false;
         case RGB_TOG:
