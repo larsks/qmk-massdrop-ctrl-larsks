@@ -125,9 +125,11 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             }
             return false;
         case RGB_RST:
+#ifdef RGB_MATRIX_STARTUP_MODE
             if (record->event.pressed) {
                 rgb_matrix_mode(RGB_MATRIX_STARTUP_MODE);
             }
+#endif
             return false;
         case RGB_DBG:
             if (record->event.pressed) {
